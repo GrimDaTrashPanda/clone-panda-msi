@@ -1,0 +1,3 @@
+io.gitlab.librewolf-community
+org.libreoffice.LibreOffice
+org.olivevideoeditor.Olive

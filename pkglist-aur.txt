@@ -1,0 +1,7 @@
+beautyline
+brave-bin
+fluent-icon-theme
+google-chrome
+microsoft-edge-stable-bin
+qogir-cursor-theme
+tela-icon-theme
