@@ -1,37 +1,40 @@
 #!/usr/bin/env bash
-# clone-panda-msi — reproduces the standard software loadout on any EndeavourOS box.
-# Run this AFTER endeavouros-deploy and BEFORE riced-potatoes.
+# clone-panda-msi — trimmed loadout installer
+# No AUR. Native-first, Flatpak fallback. Skips anything already present.
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo "==> Installing native packages (pacman)..."
-sudo pacman -S --needed --noconfirm - < "$SCRIPT_DIR/pkglist-pacman.txt"
-
-echo "==> Checking for an AUR helper..."
-if ! command -v yay &>/dev/null; then
-    echo "    yay not found — bootstrapping it now."
-    sudo pacman -S --needed --noconfirm base-devel git
-    git clone https://aur.archlinux.org/yay.git /tmp/yay-bootstrap
-    (cd /tmp/yay-bootstrap && makepkg -si --noconfirm)
-    rm -rf /tmp/yay-bootstrap
-fi
-
-echo "==> Installing AUR packages (yay)..."
-yay -S --needed --noconfirm - < "$SCRIPT_DIR/pkglist-aur.txt"
-
-echo "==> Installing Flatpak apps..."
+echo "== Ensuring Flatpak + Flathub are available =="
 if ! command -v flatpak &>/dev/null; then
     sudo pacman -S --needed --noconfirm flatpak
 fi
 if ! flatpak remote-list | grep -q flathub; then
     flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 fi
-while IFS= read -r app_id; do
-    [ -z "$app_id" ] && continue
-    flatpak install -y flathub "$app_id"
+
+echo "== Installing native (pacman) packages =="
+while read -r pkg; do
+    [ -z "$pkg" ] && continue
+    if pacman -Qq "$pkg" &>/dev/null; then
+        echo "  [skip] $pkg already installed"
+    else
+        echo "  [install] $pkg"
+        sudo pacman -S --needed --noconfirm "$pkg"
+    fi
+done < "$SCRIPT_DIR/pkglist-pacman.txt"
+
+echo "== Installing Flatpak packages =="
+while read -r app; do
+    [ -z "$app" ] && continue
+    if flatpak list --app --columns=application | grep -qx "$app"; then
+        echo "  [skip] $app already installed"
+    else
+        echo "  [install] $app"
+        flatpak install -y flathub "$app"
+    fi
 done < "$SCRIPT_DIR/pkglist-flatpak.txt"
 
-echo "==> Done. Loadout installed."
-echo "    Next: run riced-potatoes for the visual theme, then restore personal files."
+echo "== Done. Loadout installed. =="
+echo "Note: screen recorder is still TBD — not included in this pass."
