@@ -1,0 +1,5 @@
+com.discordapp.Discord
+org.kde.kdenlive
+com.obsproject.Studio
+org.gnome.meld
+org.telegram.desktop
