@@ -3,5 +3,4 @@ discord
 kdenlive
 meld
 obs-studio
-shotcut
 telegram-desktop
