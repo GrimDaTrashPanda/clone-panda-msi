@@ -1,4 +1,8 @@
 com.brave.Browser
-org.kde.kdenlive
-com.obsproject.Studio
-org.gimp.GIMP
+com.google.Chrome
+io.github.kolunmi.Bazaar
+io.gitlab.librewolf-community
+org.libreoffice.LibreOffice
+org.localsend.localsend_app
+org.olivevideoeditor.Olive
+org.videolan.VLC
