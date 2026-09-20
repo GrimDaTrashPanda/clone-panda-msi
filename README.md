@@ -1,62 +1,40 @@
 # clone-panda-msi
 
-Reproduces my standard software loadout on any EndeavourOS install.
+The standard app loadout for any Linux distro. The lists in this repo are the single source of truth for which apps get installed, and one script installs them on any distro that can run Flatpak.
 
-Despite the name, this is **not hardware-locked to the MSI** — "msi" marks where this
-snapshot was originally captured (Warranty-is-Void), not a requirement. Run this on any
-machine with a fresh EndeavourOS install and you'll end up with the same terminal,
-apps, and tools, minus personal files (those live on external storage and get
-restored separately).
+Despite the name, this isn't tied to the MSI. "msi" marks the machine the first snapshot was captured from, not a requirement.
 
-No AUR. Native-first, Flatpak fallback for everything else.
+## How it's used
 
-## What this does NOT do
+The distro deploy repos call `install-loadout.sh` as their last step, so you normally never run it by hand:
 
-- No dconf/theme/wallpaper setup — that's [riced-potatoes](https://github.com/GrimDaTrashPanda/riced-potatoes)
-- No base OS install/hardening — that's [endeavouros-deploy](https://github.com/GrimDaTrashPanda/endeavouros-deploy)
-- No personal files, documents, or configs — those live on external storage
+- [endeavouros-deploy](https://github.com/GrimDaTrashPanda/endeavouros-deploy)
+- [linux-mint-deploy](https://github.com/GrimDaTrashPanda/linux-mint-deploy)
+- [debian-deploy](https://github.com/GrimDaTrashPanda/debian-deploy)
+- [almalinux-workstation-deploy](https://github.com/GrimDaTrashPanda/almalinux-workstation-deploy)
 
-## Rebuild order
+To run it on its own:
 
-1. Fresh EndeavourOS install
-2. Run `endeavouros-deploy` (base OS setup)
-3. Run this repo (`install-loadout.sh`) — gets you a working baseline terminal/toolset
-4. Run `riced-potatoes` (visual theme/rice)
-5. Restore personal files from external storage — trivial once the above is done
-
-## Usage
-
-```
-git clone https://github.com/GrimDaTrashPanda/clone-panda-msi.git
-cd clone-panda-msi
-chmod +x install-loadout.sh
-./install-loadout.sh
-```
+    git clone https://github.com/GrimDaTrashPanda/clone-panda-msi.git
+    cd clone-panda-msi
+    bash install-loadout.sh
 
 ## What's in here
 
-- `pkglist-pacman.txt` — native packages, installed via `pacman -S --needed`
-- `pkglist-flatpak.txt` — Flatpak apps, installed from Flathub
-- `install-loadout.sh` — installs both lists in order, skipping anything already present,
-  and bootstraps Flatpak/Flathub itself if missing
+- `pkglist-flatpak.txt`: Flathub apps, installed on every distro
+- `pkglist-pacman.txt`: native packages, Arch only
+- `pkglist-native-as-flatpak.txt`: on non-Arch distros, the apps that are native on Arch, installed as Flatpaks instead
+- `install-loadout.sh`: installs the lists above, skips anything already present, keeps going if one item fails, and prints a summary at the end
 
-## Current loadout
+## Changing the loadout
 
-- Firefox (stock, untouched — default browser)
-- Brave (second browser)
-- LibreOffice
-- Kdenlive, OBS Studio, GIMP
+- **Add or remove a Flathub app:** edit `pkglist-flatpak.txt`, one app ID per line (`flatpak search <name>` shows the ID).
+- **Add a native Arch app:** add it to `pkglist-pacman.txt`, and add its Flathub ID to `pkglist-native-as-flatpak.txt` so other distros get it too.
+- **Don't overwrite `pkglist-pacman.txt` with a `pacman -Qqe` dump.** The list is deliberately small. A full dump pulls in desktop and hardware packages that don't belong on other machines.
 
-**Pending:** screen recording utility (not yet chosen, low priority)
+## Not included
 
-## Keeping this current
-
-Whenever you add new software you want to persist across rebuilds, regenerate the lists
-on the source machine and push:
-
-```
-pacman -Qqe > pkglist-pacman.txt
-flatpak list --app --columns=application > pkglist-flatpak.txt
-git add -A && git commit -m "refresh package snapshot"
-git push
-```
+- Theming and desktop settings: [riced-potatoes](https://github.com/GrimDaTrashPanda/riced-potatoes)
+- Base OS setup: the deploy repos above
+- Personal files and configs
+- Screen recorder: still TBD
