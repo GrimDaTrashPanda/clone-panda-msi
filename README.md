@@ -12,6 +12,7 @@ The distro deploy repos call `install-loadout.sh` as their last step, so you nor
 - [linux-mint-deploy](https://github.com/GrimDaTrashPanda/linux-mint-deploy)
 - [debian-deploy](https://github.com/GrimDaTrashPanda/debian-deploy)
 - [almalinux-workstation-deploy](https://github.com/GrimDaTrashPanda/almalinux-workstation-deploy)
+- [fedora-deploy](https://github.com/GrimDaTrashPanda/fedora-deploy)
 
 To run it on its own:
 
